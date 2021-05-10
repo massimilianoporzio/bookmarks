@@ -27,6 +27,8 @@ urlpatterns = [
     path('account/', include('account.urls')),
     # REGISTRAZIONE
     path('register/', register, name="register"),
+    #app images
+    path('images/', include('images.urls', namespace='images')),
 
 ]
 if settings.DEBUG:
