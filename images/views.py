@@ -1,14 +1,15 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import ImageCreateForm
 from django.shortcuts import get_object_or_404
 from .models import Image
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from bookmarks.common.decorators import ajax_required
 
-from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 
 @login_required
 def image_list(request):
@@ -36,10 +37,6 @@ def image_list(request):
                   {'section': 'images', 'images': images})
 
 
-
-
-
-
 @login_required
 @ajax_required
 @require_POST
@@ -57,7 +54,6 @@ def image_like(request):
         except:
             pass
     return JsonResponse({'status': 'error'})
-
 
 
 # Create your views here.
@@ -79,9 +75,10 @@ def image_create(request):
         # build form with data provided by the bookmarklet via GET
         form = ImageCreateForm(data=request.GET)
     return render(request,
-                      'images/image/create.html',
-                      {'section': 'images',
-                       'form': form}) #ripasso nel contest la form così se non è valida viene usata per ripopolare i campi
+                  'images/image/create.html',
+                  {'section': 'images',
+                   'form': form})  # ripasso nel contest la form così se non è valida viene usata per ripopolare i campi
+
 
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)

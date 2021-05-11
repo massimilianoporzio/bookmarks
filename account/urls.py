@@ -21,6 +21,9 @@ urlpatterns = [
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(),name='password_reset_complete'),
     #edit user info and /or Profile
     path('edit/',views.edit,name="edit"),
+    #USERS
+    path('users/',views.user_list, name="user_list"),
+    path('users/<username>/',views.user_detail,name="user_detail"),
 
 
 
