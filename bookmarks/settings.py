@@ -41,10 +41,12 @@ INSTALLED_APPS = [
 
     # third-party apps
     'django_extensions',
+    'easy_thumbnails',
 
     # my app
     'images.apps.ImagesConfig',
-    'easy_thumbnails',
+    'actions.apps.ActionsConfig',
+
 
 ]
 

@@ -13,13 +13,31 @@ from django.contrib import messages
 from .models import Profile, Contact
 
 from django.contrib.auth.decorators import login_required
+from actions.utils import create_action
+from actions.models import Action
 
 
 @login_required
 def dashboard(request):
+
+    actions = Action.objects.exclude(user=request.user) #mostro le azioni degli ALTRI UTENTI
+    following_ids = request.user.following.values_list('id',
+                                                       flat=True) #lista degli id utenti che sto seguendo
+    if following_ids:
+        # If user is following others, retrieve only their actions
+        actions = actions.filter(user_id__in=following_ids)
+    actions = actions.select_related('user','user__profile').prefetch_related('target')[:10]
+            #le prime 10 (e retrieve anche di user e relativo profile) e many to one targets
     return render(request,
                   'account/dashboard.html',
-                  {'section': 'dashboard'})
+                  {'section': 'dashboard',
+                   'actions': actions})
+
+
+
+
+
+
 
 
 def user_login(request):
@@ -58,6 +76,8 @@ def register(request):
             new_user.save()
             # Create the user profile
             Profile.objects.create(user=new_user)
+            create_action(new_user, 'has created an account')
+
             return render(request, 'account/register_done.html',
                           {
                               'new_user': new_user
@@ -99,6 +119,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
 
+
 @ajax_required
 @require_POST
 @login_required
@@ -112,6 +133,8 @@ def user_follow(request):
                 Contact.objects.get_or_create(
                     user_from=request.user,
                         user_to=user)
+                create_action(request.user, 'is following', user)
+
             else:
                 Contact.objects.filter(user_from=request.user,
                                user_to=user).delete()
