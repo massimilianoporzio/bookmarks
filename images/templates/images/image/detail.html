@@ -11,7 +11,10 @@
 {% with total_likes=image.users_like.count users_like=image.users_like.all%}
     <div class="image-info">
         <div>
+        <span class="count">{{ total_views }} view{{ total_views|pluralize }}</span>
     <span class="count">
+
+
       <span class="total">{{ total_likes }}</span>
       like{{ total_likes|pluralize }}
     </span>

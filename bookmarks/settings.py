@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-0ywmo=5*q5)p-m=vu277f2-yka!i*jq-pnvjfmbh=nm4bsrw9n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', "127.0.0.1", "mysite.com"]
+ALLOWED_HOSTS = ['localhost', "127.0.0.1", "mysite.com","10.69.68.51"]
 
 # Application definition
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # third-party apps
     'django_extensions',
     'easy_thumbnails',
+    'corsheaders',
 
     # my app
     'images.apps.ImagesConfig',
@@ -53,12 +54,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'bookmarks.urls'
 
@@ -148,3 +151,8 @@ ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: reverse_lazy('user_detail',
                                         args=[u.username])
 }
+
+#REDIS
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0

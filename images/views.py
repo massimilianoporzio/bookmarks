@@ -9,13 +9,15 @@ from django.views.decorators.http import require_POST
 from bookmarks.common.decorators import ajax_required
 
 from actions.utils import create_action
-
+import redis
+from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+r = redis.Redis(host=settings.REDIS_HOST,port=settings.REDIS_PORT,db=settings.REDIS_DB)
 
 @login_required
 def image_list(request):
-    images = Image.objects.all()
+    # images = Image.objects.all()
+    images = Image.objects.order_by('-total_likes')
     paginator = Paginator(images, 8)
     page = request.GET.get('page')
     try:
@@ -87,7 +89,29 @@ def image_create(request):
 
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
+    #incremento le visite della pagina
+    total_views = r.incr(f'image:{image.id}:views')
+    #incremento il ranking
+    r.zincrby('image_ranking',1,image.id)
+
     return render(request,
                   'images/image/detail.html',
                   {'section': 'images',
+                   'total_views':total_views,
                    'image': image})
+
+@login_required
+def image_ranking(request):
+    image_ranking = r.zrange('image_ranking',0,-1,desc=True)[:10]
+    image_ranking_ids = [int(id) for id in image_ranking] #casto a int
+
+    #prendo le immagini più viste
+    most_viewed = list(Image.objects.filter(id__in=image_ranking_ids))
+    most_viewed.sort(key=lambda x:image_ranking_ids.index(x.id))
+    return render(request,
+                  'images/image/ranking.html',
+                  {
+                      'section' : 'images',
+                      'most_viewed':most_viewed
+                  }
+                  )
